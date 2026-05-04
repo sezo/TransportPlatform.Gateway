@@ -21,7 +21,9 @@ services:
       - Redis__ConnectionString=redis:6379
       - Observability__OtlpEndpoint=http://otel-collector:4317
     networks:
-      - transport-net
+      transport-net:
+        aliases:
+          - gateway-public
 
   gateway-internal:
     build:
@@ -38,7 +40,9 @@ services:
       - Keycloak__Audience=internal-gateway
       - Observability__OtlpEndpoint=http://otel-collector:4317
     networks:
-      - transport-net
+      transport-net:
+        aliases:
+          - gateway-internal
 
 networks:
   transport-net:
