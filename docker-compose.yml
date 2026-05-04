@@ -1,0 +1,41 @@
+name: transport_gateway
+
+services:
+
+  gateway-public:
+    build:
+      context: .
+      dockerfile: src/TransportPlatform.Gateway.Public/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - Keycloak__Authority=http://keycloak:8080/realms/transport
+      - Keycloak__Audience=public-gateway
+      - Keycloak__TokenEndpoint=http://keycloak:8080/realms/transport/protocol/openid-connect/token
+      - Keycloak__GatewayClientId=public-gateway
+      - Keycloak__GatewayClientSecret=change-me-in-production
+      - Redis__ConnectionString=redis:6379
+      - Observability__OtlpEndpoint=http://otel-collector:4317
+    networks:
+      - transport-net
+
+  gateway-internal:
+    build:
+      context: .
+      dockerfile: src/TransportPlatform.Gateway.Internal/Dockerfile
+    ports:
+      - "8081:8081"     # In production — NOT exposed, VPN only
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8081
+      - Keycloak__Authority=http://keycloak:8080/realms/transport
+      - Keycloak__Audience=internal-gateway
+      - Observability__OtlpEndpoint=http://otel-collector:4317
+    networks:
+      - transport-net
+
+networks:
+  transport-net:
+    external: true
