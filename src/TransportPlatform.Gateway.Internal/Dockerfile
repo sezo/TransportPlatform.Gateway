@@ -4,6 +4,8 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
+COPY ["NuGet.config", "NuGet.config"]
+RUN sed -i 's/localhost:5555/host.docker.internal:5555/g' NuGet.config
 COPY ["src/TransportPlatform.Gateway.Internal/TransportPlatform.Gateway.Internal.csproj", "src/TransportPlatform.Gateway.Internal/"]
 RUN dotnet restore "src/TransportPlatform.Gateway.Internal/TransportPlatform.Gateway.Internal.csproj"
 COPY . .
